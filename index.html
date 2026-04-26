@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SENSIOBMAX VIP X2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&display=swap');
+        body { background: #010409; font-family: 'Segoe UI', sans-serif; color: white; margin: 0; overflow-x: hidden; }
+        .font-cyber { font-family: 'Orbitron', sans-serif; }
+        .glass { background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.08); }
+        .popup { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+        .btn-click:active { transform: scale(0.96); transition: 0.1s; }
+        .hidden { display: none !important; }
+        
+        /* Hiệu ứng biểu đồ cột */
+        .bar { width: 12px; background: linear-gradient(to top, #3b82f6, #60a5fa); border-radius: 4px; transition: height 0.4s ease; }
+        
+        /* Hiệu ứng chạy chữ thông báo */
+        .marquee { overflow: hidden; white-space: nowrap; }
+        .marquee p { display: inline-block; animation: marquee 15s linear infinite; }
+        @keyframes marquee { 0% { transform: translate(100%, 0); } 100% { transform: translate(-100%, 0); } }
+
+        /* Neon Border */
+        .neon-border { border: 1px solid #3b82f6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+    </style>
+</head>
+<body>
+
+    <div id="auth-screen" class="popup">
+        <div id="login-box" class="glass w-[90%] max-w-[380px] p-8 rounded-[2.5rem] border-t-4 border-blue-500 shadow-2xl">
+            <h2 class="font-cyber text-blue-500 font-black mb-6 uppercase text-center text-xl tracking-tighter">Đăng Nhập</h2>
+            <div class="space-y-4">
+                <input type="text" id="user-input" placeholder="Tên đăng nhập..." class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-blue-500 text-sm">
+                <input type="password" placeholder="Mật khẩu..." class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-blue-500 text-sm">
+                <button onclick="login()" class="w-full bg-blue-600 py-4 rounded-2xl font-black uppercase text-[10px] btn-click shadow-lg">Vào Hệ Thống</button>
+                <div class="flex justify-between text-[10px] font-bold uppercase text-gray-500 px-2">
+                    <span onclick="toggleAuth('register')" class="cursor-pointer hover:text-blue-400">Đăng ký ngay</span>
+                    <span onclick="toggleAuth('forgot')" class="cursor-pointer hover:text-red-400">Quên mật khẩu?</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="register-box" class="glass w-[90%] max-w-[380px] p-8 rounded-[2.5rem] border-t-4 border-green-500 shadow-2xl hidden">
+            <h2 class="font-cyber text-green-500 font-black mb-6 uppercase text-center text-xl tracking-tighter">Đăng Ký</h2>
+            <div class="space-y-4">
+                <input type="text" placeholder="Số điện thoại / Email..." class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-green-500 text-sm">
+                <input type="password" placeholder="Mật khẩu mới..." class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-green-500 text-sm">
+                <button onclick="toggleAuth('login')" class="w-full bg-green-600 py-4 rounded-2xl font-black uppercase text-[10px] btn-click">Tạo Tài Khoản</button>
+            </div>
+        </div>
+
+        <div id="forgot-box" class="glass w-[90%] max-w-[380px] p-8 rounded-[2.5rem] border-t-4 border-red-500 shadow-2xl hidden">
+            <h2 class="font-cyber text-red-500 font-black mb-6 uppercase text-center text-xl tracking-tighter">Khôi Phục</h2>
+            <p class="text-[10px] text-gray-400 mb-4 text-center">Vui lòng liên hệ Admin Huy để lấy lại mật khẩu.</p>
+            <button onclick="toggleAuth('login')" class="w-full bg-white/10 py-4 rounded-2xl font-black uppercase text-[10px] btn-click">Quay lại</button>
+        </div>
+    </div>
+
+    <div id="admin-panel" class="fixed top-20 right-0 z-[2000]">
+        <button onclick="askAdminPass()" class="bg-red-600 p-3 rounded-l-full font-black text-[9px] shadow-lg">ADMIN</button>
+    </div>
+
+    <div id="main-content" class="hidden">
+        <div class="bg-blue-600/20 py-2 border-b border-blue-500/30 marquee">
+            <p class="text-[10px] font-black uppercase italic text-blue-400">Hệ thống hoạt động từ 06:00 đến 23:30 hằng ngày - Nạp tiền tự động sau 30 giây - Liên hệ Admin Huy: 0397.xxx.xxx</p>
+        </div>
+
+        <header class="p-4 flex items-center justify-between glass sticky top-0 z-50">
+            <button onclick="showMenu()" class="text-2xl btn-click text-blue-500">☰</button>
+            <div class="text-center">
+                <h1 class="text-lg font-black italic text-blue-500 font-cyber tracking-tighter">SENSIOBMAX</h1>
+                <div class="flex items-center gap-1 text-[8px] font-bold text-green-400">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                    ONLINE: <span id="online-count">4.500</span>
+                </div>
+            </div>
+            <div class="text-right">
+                <p class="text-[8px] text-gray-400 uppercase font-black">Số dư ví</p>
+                <p class="text-sm font-black text-yellow-500" id="user-balance">0đ</p>
+            </div>
+        </header>
+
+        <main class="p-4 space-y-6 pb-24">
+            <section class="glass p-5 rounded-[2rem] neon-border">
+                <div class="flex justify-between items-center mb-4">
+                    <p class="text-[10px] font-black text-blue-400 uppercase italic">Dòng tiền hệ thống</p>
+                    <p class="text-lg font-black font-cyber text-white" id="system-money">35.450.000đ</p>
+                </div>
+                <div class="flex items-end justify-between h-16 px-2" id="chart">
+                    <div class="bar h-6"></div><div class="bar h-12"></div><div class="bar h-8"></div><div class="bar h-14"></div>
+                    <div class="bar h-10"></div><div class="bar h-5"></div><div class="bar h-11"></div><div class="bar h-7"></div>
+                </div>
+            </section>
+
+            <div class="grid grid-cols-3 gap-2">
+                <a href="https://link4m.com/AxI17" class="glass p-3 rounded-2xl text-center border-b-2 border-red-500">
+                    <p class="text-[8px] font-black text-red-500">NETPLUS V8</p>
+                    <p class="text-[7px] text-gray-500">KEY 48H</p>
+                </a>
+                <a href="https://link4m.com/AxI17" class="glass p-3 rounded-2xl text-center border-b-2 border-red-500">
+                    <p class="text-[8px] font-black text-red-500">HOPPER V10</p>
+                    <p class="text-[7px] text-gray-500">KEY 48H</p>
+                </a>
+                <a href="https://link4m.com/AxI17" class="glass p-3 rounded-2xl text-center border-b-2 border-red-500">
+                    <p class="text-[8px] font-black text-red-500">ITA-PING V10</p>
+                    <p class="text-[7px] text-gray-500">KEY 48H</p>
+                </a>
+            </div>
+
+            <h2 class="text-center text-[10px] font-black uppercase text-blue-500 tracking-[0.3em]">Danh sách file VIP</h2>
+            <div id="product-list" class="space-y-3"></div>
+        </main>
+    </div>
+
+    <div id="menu-box" class="popup hidden" onclick="hideAll()">
+        <div class="glass w-[85%] max-w-[340px] p-6 rounded-[3rem] space-y-3 border-t-4 border-blue-500 shadow-blue-500/20" onclick="event.stopPropagation()">
+            <h3 class="text-center font-cyber text-blue-500 font-black italic uppercase text-xs mb-4">Hệ Thống VIP X2</h3>
+            <div class="grid gap-2 font-bold text-[10px] uppercase italic">
+                <button onclick="showBank()" class="p-4 bg-white/5 rounded-2xl text-yellow-400 text-left flex justify-between"><span>💳 Nạp Tiền Bank/Card</span> <span>+</span></button>
+                <button class="p-4 bg-white/5 rounded-2xl text-green-400 text-left">📊 Dòng Tiền Cá Nhân</button>
+                <button class="p-4 bg-white/5 rounded-2xl text-blue-400 text-left">📣 Tiếp Thị Sản Phẩm</button>
+                <a href="https://zalo.me/0397208110" class="p-4 bg-white/5 rounded-2xl text-red-400 text-left">📞 Liên hệ Admin Huy</a>
+                <button onclick="location.reload()" class="p-4 bg-red-500/20 rounded-2xl text-red-500 text-center mt-4">Đăng Xuất</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="bank-box" class="popup hidden" onclick="hideAll()">
+        <div class="glass w-[92%] max-w-[380px] p-8 rounded-[3rem] text-center border-t-4 border-blue-500" onclick="event.stopPropagation()">
+            <p class="text-[10px] font-black text-blue-400 mb-2">QUÉT MÃ ĐỂ NẠP VÀO VÍ</p>
+            <img src="https://api.vietqr.io/image/970422-0397208110-3796D5.jpg?accountName=NGUYEN%20QUOC%20HUY" class="w-60 h-60 mx-auto rounded-2xl mb-6 shadow-2xl border-4 border-white/5">
+            <div class="bg-blue-500/10 p-4 rounded-2xl text-[10px] font-bold text-left mb-6">
+                <p>Nội dung: <span class="text-white">NAP <span id="user-tag">USER</span></span></p>
+                <p class="mt-1 text-gray-400">Tiền sẽ cộng vào ví sau 30s-60s.</p>
+            </div>
+            <button onclick="hideAll()" class="w-full bg-blue-600 py-4 rounded-2xl font-black uppercase text-[10px] btn-click">Đóng</button>
+        </div>
+    </div>
+
+    <script>
+        // Hệ thống sản phẩm
+        const products = [
+            {n: "Headlock Adr V1", p: "100.000đ"}, {n: "Headlock Adr V2", p: "200.000đ"},
+            {n: "Aimlock iOS VIP", p: "50.000đ"}, {n: "Fluorite Pro 100K", p: "100.000đ"},
+            {n: "Fluorite Max 300K", p: "300.000đ"}, {n: "Aimbody 100% Adr", p: "250.000đ"},
+            {n: "Định Vị Android", p: "150.000đ"}, {n: "Antiban VIP 500K", p: "500.000đ"},
+            {n: "Combo Rank VIP", p: "450.000đ"}
+        ];
+
+        function renderProducts() {
+            const list = document.getElementById('product-list');
+            products.forEach(item => {
+                const sold = Math.floor(Math.random() * 3000) + 1000;
+                const stock = Math.floor(Math.random() * 9000) + 1000;
+                const active = Math.floor(Math.random() * 1000) + 500;
+                list.innerHTML += `
+                    <div class="glass p-5 rounded-3xl border-l-4 border-blue-500 flex justify-between items-center">
+                        <div>
+                            <p class="text-white font-black text-xs uppercase italic">${item.n}</p>
+                            <p class="text-[10px] font-bold text-blue-400">${item.p}</p>
+                            <div class="flex gap-3 text-[7px] font-bold text-gray-500 uppercase mt-2">
+                                <span>Bán: ${sold.toLocaleString()}</span>
+                                <span>Kho: ${stock.toLocaleString()}</span>
+                                <span>Dùng: ${active.toLocaleString()}</span>
+                            </div>
+                        </div>
+                        <button onclick="showBank()" class="bg-blue-600 px-6 py-2.5 rounded-xl text-[9px] font-black btn-click shadow-lg">MUA</button>
+                    </div>`;
+            });
+        }
+
+        // Xử lý đăng nhập
+        function login() {
+            const user = document.getElementById('user-input').value;
+            if(!user) return alert("Vui lòng nhập tên!");
+            document.getElementById('user-tag').innerText = user.toUpperCase();
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('main-content').classList.remove('hidden');
+            renderProducts();
+            startLoops();
+        }
+
+        function toggleAuth(type) {
+            document.getElementById('login-box').classList.add('hidden');
+            document.getElementById('register-box').classList.add('hidden');
+            document.getElementById('forgot-box').classList.add('hidden');
+            document.getElementById(type + '-box').classList.remove('hidden');
+        }
+
+        // Admin mật khẩu
+        function askAdminPass() {
+            const pass = prompt("Nhập mật khẩu Admin để đóng/mở hệ thống:");
+            if(pass === "huyvip") {
+                const main = document.getElementById('main-content');
+                if(main.classList.contains('hidden')) {
+                    main.classList.remove('hidden');
+                    alert("Hệ thống đã MỞ");
+                } else {
+                    main.classList.add('hidden');
+                    alert("Hệ thống đã ĐÓNG");
+                }
+            } else {
+                alert("Sai mật khẩu!");
+            }
+        }
+
+        function startLoops() {
+            setInterval(() => {
+                // Nhảy số online
+                document.getElementById('online-count').innerText = (Math.floor(Math.random() * 12000) + 3000).toLocaleString();
+                // Nhảy dòng tiền
+                document.getElementById('system-money').innerText = (Math.floor(Math.random() * 40000000) + 10000000).toLocaleString() + "đ";
+                // Nhảy biểu đồ
+                document.querySelectorAll('.bar').forEach(b => b.style.height = (Math.floor(Math.random() * 40) + 10) + 'px');
+            }, 3000);
+        }
+
+        function showMenu() { document.getElementById('menu-box').classList.remove('hidden'); }
+        function showBank() { hideAll(); document.getElementById('bank-box').classList.remove('hidden'); }
+        function hideAll() { 
+            document.getElementById('menu-box').classList.add('hidden'); 
+            document.getElementById('bank-box').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
+ 
